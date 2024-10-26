@@ -1,0 +1,23 @@
+function sendDataToDatabase() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const dataRange = sheet.getDataRange();
+  const data = dataRange.getValues();
+  
+  for (let i = 1; i < data.length; i++) { // Start from 1 to skip header row
+    const row = data[i];
+    const payload = {
+      name: row[0],
+      email: row[1],
+      phone_number: row[2],
+      preferred_climbing_time: row[3]
+    };
+    
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload)
+    };
+    
+    UrlFetchApp.fetch("https://your-rest-api-url.com/store-data", options);
+  }
+}
