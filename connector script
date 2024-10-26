@@ -1,0 +1,40 @@
+pip install Flask mysql-connector-python
+
+from flask import Flask, request, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+
+# Database connection
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="your_password",
+        database="bouldering_gym"
+    )
+
+@app.route('/store-data', methods=['POST'])
+def store_data():
+    data = request.get_json()
+
+    name = data['name']
+    email = data['email']
+    phone_number = data.get('phone_number')
+    preferred_climbing_time = data.get('preferred_climbing_time')
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("""
+        INSERT INTO inquiries (name, email, phone_number, preferred_climbing_time)
+        VALUES (%s, %s, %s, %s)
+    """, (name, email, phone_number, preferred_climbing_time))
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    return jsonify({"message": "Data stored successfully"}), 201
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
